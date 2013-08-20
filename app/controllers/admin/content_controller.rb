@@ -12,7 +12,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def merge_articles
-    current_article_id,target_article_id = params[:article_id],params[:target_article_id]
+    current_article_id,target_article_id = params[:article_id],params[:merge_with]
     current_article = Article.find(current_article_id)
     begin
       current_article.merge_with(target_article_id)

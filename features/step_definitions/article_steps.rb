@@ -20,6 +20,6 @@ end
 
 Given /I submit the merge article's form with (.*) id/ do |article_title|
   article_id = Article.find_by_title(article_title).id
-  step "I fill in \"target_article_id\" with \"#{article_id}\""
+  step "I fill in \"merge_with\" with \"#{article_id}\""
   click_button("Merge")
 end
