@@ -670,5 +670,49 @@ describe Admin::ContentController do
       end
 
     end
+
+    describe 'merge article action' do
+      before :each do
+        @article_mock = mock('article')
+        @article_mock.stub(:merge_with)
+        Article.stub(:find).and_return(@article_mock)
+      end
+
+      it 'should find the current article' do
+        Article.should_receive(:find).with(1).once
+        get :merge_articles, article_id: 1, target_article_id: 2
+      end
+
+      describe 'after finding the articles' do
+
+        it 'should should call the merge_with method on the current_article with the target_article id' do
+          @article_mock.should_receive(:merge_with).with(2)
+          get :merge_articles, article_id: 1, target_article_id: 2
+        end
+
+        it 'should redirect_to home with flash error if merge_with raise SameArticle Error' do
+          @article_mock.should_receive(:merge_with).with(1).and_raise(Article::SameArticleError)
+          get :merge_articles, article_id: 1, target_article_id: 1
+          flash[:error].should == "The articles to merge can't be the same"
+          response.should redirect_to '/'
+        end
+
+        it 'should redirect_to home with flash error if the article to merge do not exist' do
+          @article_mock.should_receive(:merge_with).with(2).and_raise(Article::ArticleDoesNotExistError)
+          get :merge_articles, article_id: 1, target_article_id: 2
+          flash[:error].should == "The target article does not exist"
+          response.should redirect_to '/'
+        end
+
+      end
+
+      describe 'after merging with success' do
+        it 'should redirect_to home with flash notice articles merged with success' do
+          get :merge_articles, article_id: 1, target_article_id: 2
+          flash[:notice].should == "Articles merged with success"
+          response.should redirect_to '/'
+        end
+      end
+    end
   end
 end

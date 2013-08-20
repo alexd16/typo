@@ -61,6 +61,15 @@ class Article < Content
 
   setting :password,                   :string, ''
 
+  class SameArticleError < StandardError; end
+  class ArticleDoesNotExistError < StandardError; end
+
+  def merge_with(target_article_id)
+    target_article = Article.find(target_article_id)
+    self.body= "#{self.body} #{target_article.body}"
+    self.save
+  end
+
   def initialize(*args)
     super
     # Yes, this is weird - PDC

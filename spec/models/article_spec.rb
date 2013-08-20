@@ -100,7 +100,7 @@ describe Article do
   it "test_permalink_with_title" do
     article = Factory(:article, :permalink => 'article-3', :published_at => Time.utc(2004, 6, 1))
     assert_equal(article,
-                Article.find_by_permalink({:year => 2004, :month => 06, :day => 01, :title => "article-3"}) )
+                 Article.find_by_permalink({:year => 2004, :month => 06, :day => 01, :title => "article-3"}) )
     assert_raises(ActiveRecord::RecordNotFound) do
       Article.find_by_permalink :year => 2005, :month => "06", :day => "01", :title => "article-5"
     end
@@ -184,25 +184,25 @@ describe Article do
   ### XXX: Should we have a test here?
   it "test_send_multiple_pings" do
   end
-  
+
   describe "Testing redirects" do
     it "a new published article gets a redirect" do
       a = Article.create(:title => "Some title", :body => "some text", :published => true)
       a.redirects.first.should_not be_nil
       a.redirects.first.to_path.should == a.permalink_url
     end
-    
-    it "a new unpublished article should not get a redirect" do 
+
+    it "a new unpublished article should not get a redirect" do
       a = Article.create(:title => "Some title", :body => "some text", :published => false)
       a.redirects.first.should be_nil
     end
-    
+
     it "Changin a published article permalink url should only change the to redirection" do
       a = Article.create(:title => "Some title", :body => "some text", :published => true)
       a.redirects.first.should_not be_nil
       a.redirects.first.to_path.should == a.permalink_url
       r  = a.redirects.first.from_path
-      
+
       a.permalink = "some-new-permalink"
       a.save
       a.redirects.first.should_not be_nil
@@ -275,7 +275,7 @@ describe Article do
 
   it "test_future_publishing" do
     assert_sets_trigger(Article.create!(:title => 'title', :body => 'body',
-      :published => true, :published_at => Time.now + 4.seconds))
+                                        :published => true, :published_at => Time.now + 4.seconds))
   end
 
   it "test_future_publishing_without_published_flag" do
@@ -399,13 +399,13 @@ describe Article do
   describe 'body_and_extended' do
     before :each do
       @article = Article.new(
-        :body => 'basic text',
-        :extended => 'extended text to explain more and more how Typo is wonderful')
+          :body => 'basic text',
+          :extended => 'extended text to explain more and more how Typo is wonderful')
     end
 
     it 'should combine body and extended content' do
       @article.body_and_extended.should ==
-        "#{@article.body}\n<!--more-->\n#{@article.extended}"
+          "#{@article.body}\n<!--more-->\n#{@article.extended}"
     end
 
     it 'should not insert <!--more--> tags if extended is empty' do
@@ -571,7 +571,7 @@ describe Article do
     describe "#find_by_permalink" do
       it "uses UTC to determine correct day" do
         @a.save
-        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 21, :permalink => 'a-big-article' 
+        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 21, :permalink => 'a-big-article'
         a.should == @a
       end
     end
@@ -592,11 +592,12 @@ describe Article do
     describe "#find_by_permalink" do
       it "uses UTC to determine correct day" do
         @a.save
-        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 22, :permalink => 'a-big-article' 
+        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 22, :permalink => 'a-big-article'
         a.should == @a
       end
     end
   end
+
 
   describe "#get_or_build" do
     context "when no params given" do
@@ -630,5 +631,31 @@ describe Article do
     end
 
   end
+
+  describe '#merge_with' do
+    before :each do
+      @article = Factory.build(:article, :body => "init")
+      @target_article = Factory.build(:article, :body => "merge")
+    end
+
+    it 'should find the target article with the target_article_id' do
+      Article.should_receive(:find).with(1).and_return(@target_article)
+      @article.merge_with(1)
+    end
+
+    context 'after finding target article' do
+      before :each do
+        Article.stub(:find).with(2).and_return(@target_article)
+      end
+
+      it 'should merge the content with the target article content' do
+        @article.merge_with(2)
+        @article.body.should =~ /init.*merge/
+      end
+
+    end
+
+  end
+
 end
 
