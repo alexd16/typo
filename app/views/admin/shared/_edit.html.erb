@@ -5,11 +5,11 @@
 
 <% end %>
 
-<% unless @article.nil? %>
+<% if !@article.nil? && current_user.admin? %>
     <%= form_tag("/admin/content/merge_articles", method: "get") do %>
         <h3>Merge Articles</h3>
         <%= label_tag("merge_with", "Article Id:") %>
-        <%= text_field_tag("merge_with", id: 'merge_with') %>
+        <%= text_field_tag("merge_with") %>
         <%= submit_tag("Merge") %>
         <%= hidden_field_tag(:article_id, @article.id) %>
     <% end %>
