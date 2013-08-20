@@ -67,7 +67,9 @@ class Article < Content
   def merge_with(target_article_id)
     target_article = Article.find(target_article_id)
     self.body= "#{self.body} #{target_article.body}"
+    self.comments << target_article.comments
     self.save
+    target_article.delete
   end
 
   def initialize(*args)
