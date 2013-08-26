@@ -646,6 +646,8 @@ describe Article do
     context 'after finding target article' do
       before :each do
         Article.stub(:find).with(2).and_return(@target_article)
+        @article_comment = Factory(:comment, article: @article)
+        @target_article_comment = Factory(:comment, article: @target_article)
       end
 
       it 'should merge the content with the target article content' do
@@ -653,6 +655,17 @@ describe Article do
         @article.body.should =~ /init.*merge/
       end
 
+      it 'should delete the target article' do
+
+      end
+
+
+      it 'should keep the target articles comments' do
+        @article.comments.count.should == 1
+        @article.merge_with(2)
+        @article.comments.count.should == 2
+        @article.comments.should =~ [@article_comment, @target_article_comment]
+      end
     end
 
   end
