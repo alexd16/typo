@@ -655,10 +655,6 @@ describe Article do
         @article.body.should =~ /init.*merge/
       end
 
-      it 'should delete the target article' do
-
-      end
-
 
       it 'should keep the target articles comments' do
         @article.comments.count.should == 1
